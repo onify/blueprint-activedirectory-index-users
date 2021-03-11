@@ -1,0 +1,37 @@
+{
+  "name": "@onify/blueprint-google-api-auth",
+  "version": "0.0.1",
+  "description": "Onify Blueprint: Authenticate against Google API with service account",
+  "scripts": {
+    "test": "mocha",
+    "posttest": "eslint . --cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onify/blueprint-google-api-auth.git"
+  },
+  "keywords": [
+    "onify",
+    "blueprint",
+    "google"
+  ],
+  "author": {
+    "name": "Onify",
+    "url": "https://github.com/onify"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/onify/blueprint-google-api-auth/issues"
+  },
+  "homepage": "https://github.com/onify/blueprint-google-api-auth#readme",
+  "devDependencies": {
+    "@onify/flow-validator": "^0.0.1",
+    "chai": "^4.3.4",
+    "cron": "^1.8.2",
+    "eslint": "^7.22.0",
+    "mocha": "^8.3.2"
+  },
+  "files": [
+    "activedirectory-index-users.bpmn"
+  ]
+}

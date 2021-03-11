@@ -1,0 +1,26 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "eol-last": [2, "always"],
+    "indent": ["error", 2, {"SwitchCase": 1}],
+    "linebreak-style": [2, "unix"],
+    "no-console": 2,
+    "no-fallthrough": 0,
+    "quotes": [2, "single"],
+    "prefer-const": [2, {"destructuring": "all"}],
+    "semi": [2, "always"],
+    "space-before-function-paren": [2, {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "unicode-bom": [2, "never"]
+  }
+}
