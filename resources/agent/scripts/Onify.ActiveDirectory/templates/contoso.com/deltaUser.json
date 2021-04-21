@@ -1,0 +1,25 @@
+﻿{
+    "name":  "\u003cgivenname\u003e \u003csn\u003e",
+    "description":  "\u003ccompany\u003e \u003ctitle\u003e ",
+    "type":  "user",
+    "icon":  "/icons/user.svg",
+    "tag":  [
+                "user"
+            ],
+    "key":  "\u003csamaccountname\u003e",
+    "status":  "\u003cstatus\u003e",
+    "color":  "\u003cstatusColor\u003e",
+    "attribute":  {
+                      "_info":  "\u003cinfo\u003e",
+                      "company":  "\u003ccompany\u003e",
+                      "username":  "\u003csamaccountname\u003e",
+                      "_id":  "\u003csamaccountname\u003e_\u003cobjectguid\u003e",
+                      "mail":  "\u003cmail\u003e",
+                      "_delta_oldCN":  "\u003coldcn\u003e",
+                      "mobilephone":  "\u003cmobile\u003e",
+                      "office":  "\u003cphysicaldeliveryofficename\u003e",
+                      "_delta_adAction":  "\u003caction\u003e",
+                      "title":  "\u003ctitle\u003e",
+                      "phone":  "\u003cphone\u003e"
+                  }
+}

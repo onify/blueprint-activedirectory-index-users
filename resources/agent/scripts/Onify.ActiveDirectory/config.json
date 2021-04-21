@@ -1,0 +1,53 @@
+﻿{
+    "domains":  {
+                    "domainController":  "dc01.contoso.com",
+                    "searchConfig":  [
+                                         {
+                                             "cache":  true,
+                                             "name":  "user",
+                                             "statusColor":  {
+                                                                 "Active":  "#559e31",
+                                                                 "Locked":  "#fc3c59",
+                                                                 "Exipred":  "#f9cc2a",
+                                                                 "Disabled":  "#f9cc2a"
+                                                             },
+                                             "searchBases":  [
+                                                                 {
+                                                                     "searchBase":  "DC=contoso,DC=com",
+                                                                     "property":  [
+                                                                                      "accountexpires",
+                                                                                      "title",
+                                                                                      "company",
+                                                                                      "lockedout",
+                                                                                      "displayname",
+                                                                                      "info",
+                                                                                      "mobile",
+                                                                                      "physicaldeliveryofficename",
+                                                                                      "mail"
+                                                                                  ],
+                                                                     "name":  "ALL Users",
+                                                                     "enabled":  true,
+                                                                     "ldapFilter":  "(\u0026(objectCategory=person)(objectClass=user))"
+                                                                 }
+                                                             ],
+                                             "enabled":  true
+                                         },
+                                         {
+                                             "cache":  true,
+                                             "name":  "computer",
+                                             "searchBases":  [
+                                                                 {
+                                                                     "searchBase":  "DC=contoso,DC=com",
+                                                                     "property":  "managedby",
+                                                                     "name":  "ALL Computers",
+                                                                     "enabled":  true,
+                                                                     "ldapFilter":  "(\u0026(objectCategory=computer)(objectClass=computer))"
+                                                                 }
+                                                             ],
+                                             "enabled":  true
+                                         }
+                                     ],
+                    "domainDN":  "DC=contoso,DC=com",
+                    "domainName":  "contoso.com"
+                }
+}

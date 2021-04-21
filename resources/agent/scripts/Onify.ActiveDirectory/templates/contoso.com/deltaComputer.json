@@ -1,0 +1,15 @@
+﻿{
+    "name":  "\u003cname\u003e",
+    "description":  "\u003cname\u003e",
+    "type":  "computer",
+    "icon":  "/icons/computer.svg",
+    "tag":  [
+                "computer"
+            ],
+    "key":  "\u003csamaccountname\u003e",
+    "status":  "\u003cstatus\u003e",
+    "color":  "\u003cstatusColor\u003e",
+    "attribute":  {
+                      "managedby":  "\u003cmanagedby\u003e"
+                  }
+}
