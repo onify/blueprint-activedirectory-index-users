@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_1m70y72" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.7.0">
-  <bpmn:message id="Message_1tveek5" name="readUsersFromJsonFile" />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_1m70y72" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.5.0">
   <bpmn:process id="blueprint-activedirectory-index-users" name="Onify Blueprint: Indexing users from Active Directory" isExecutable="true">
     <bpmn:serviceTask id="prepareUsersFullIndex" name="Prepare user data for indexing (full index)">
       <bpmn:extensionElements>
@@ -24,6 +23,9 @@ next(null, payload);</camunda:script>
           </camunda:inputOutput>
           <camunda:connectorId>onifyApiRequest</camunda:connectorId>
         </camunda:connector>
+        <camunda:properties>
+          <camunda:property name="alert_stateid" value="waitForPrepareTask" />
+        </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0izjmr2</bpmn:incoming>
       <bpmn:outgoing>Flow_1er9c24</bpmn:outgoing>
@@ -63,7 +65,7 @@ next(null, itemUsers);</bpmn:script>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_124zfr6</bpmn:incoming>
       <bpmn:outgoing>Flow_13w4uso</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0k9c7dx" messageRef="Message_1tveek5" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0k9c7dx" />
     </bpmn:intermediateCatchEvent>
     <bpmn:exclusiveGateway id="gatewayRecords" name="Any records?" default="Flow_0zpm66f">
       <bpmn:incoming>Flow_1ed581e</bpmn:incoming>
@@ -103,6 +105,9 @@ next(null, payload);</camunda:script>
         <camunda:inputOutput>
           <camunda:outputParameter name="readUsersFromJsonFileTaskId">${content.output.body.id}</camunda:outputParameter>
         </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="alert_stateid" value="waitForReadTask" />
+        </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1escxth</bpmn:incoming>
       <bpmn:incoming>Flow_18ce93m</bpmn:incoming>
@@ -128,7 +133,7 @@ next(null, true);</bpmn:conditionExpression>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1er9c24</bpmn:incoming>
       <bpmn:outgoing>Flow_18ce93m</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1rjqcgv" messageRef="Message_14nfjh5" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1rjqcgv" />
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_1er9c24" sourceRef="prepareUsersFullIndex" targetRef="waitForPrepareTask" />
     <bpmn:sequenceFlow id="Flow_18ce93m" sourceRef="waitForPrepareTask" targetRef="readUsersFromJsonFile" />
@@ -152,12 +157,8 @@ next(null, true);</bpmn:conditionExpression>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_0azs29r" sourceRef="readUsersFromJsonFile" targetRef="TextAnnotation_1dcil0f" />
   </bpmn:process>
-  <bpmn:message id="Message_14nfjh5" name="prepareUsersFullIndex" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="blueprint-activedirectory-index-users">
-      <bpmndi:BPMNShape id="TextAnnotation_0whs6t4_di" bpmnElement="TextAnnotation_0whs6t4">
-        <dc:Bounds x="400" y="120" width="120" height="30" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0zpm66f_di" bpmnElement="Flow_0zpm66f">
         <di:waypoint x="1085" y="240" />
         <di:waypoint x="1182" y="240" />
@@ -165,9 +166,17 @@ next(null, true);</bpmn:conditionExpression>
           <dc:Bounds x="1126" y="222" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0izjmr2_di" bpmnElement="Flow_0izjmr2">
+        <di:waypoint x="198" y="240" />
+        <di:waypoint x="300" y="240" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_18ce93m_di" bpmnElement="Flow_18ce93m">
         <di:waypoint x="508" y="240" />
         <di:waypoint x="590" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1er9c24_di" bpmnElement="Flow_1er9c24">
+        <di:waypoint x="400" y="240" />
+        <di:waypoint x="472" y="240" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_124zfr6_di" bpmnElement="Flow_124zfr6">
         <di:waypoint x="690" y="240" />
@@ -196,14 +205,9 @@ next(null, true);</bpmn:conditionExpression>
         <di:waypoint x="798" y="240" />
         <di:waypoint x="880" y="240" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0izjmr2_di" bpmnElement="Flow_0izjmr2">
-        <di:waypoint x="198" y="240" />
-        <di:waypoint x="300" y="240" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1er9c24_di" bpmnElement="Flow_1er9c24">
-        <di:waypoint x="400" y="240" />
-        <di:waypoint x="472" y="240" />
-      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_042nzfe_di" bpmnElement="prepareUsersFullIndex" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="300" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_08pf7oz_di" bpmnElement="transformUsers">
         <dc:Bounds x="880" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -225,18 +229,6 @@ next(null, true);</bpmn:conditionExpression>
       <bpmndi:BPMNShape id="Activity_1ms67yf_di" bpmnElement="readUsersFromJsonFile" bioc:stroke="black" bioc:fill="white">
         <dc:Bounds x="590" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0oqoqme_di" bpmnElement="EndEvent">
-        <dc:Bounds x="1182" y="222" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1190" y="265" width="20" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1dcil0f_di" bpmnElement="TextAnnotation_1dcil0f">
-        <dc:Bounds x="690" y="340" width="100" height="30" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_042nzfe_di" bpmnElement="prepareUsersFullIndex" bioc:stroke="black" bioc:fill="white">
-        <dc:Bounds x="300" y="200" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1hmkinc_di" bpmnElement="waitForPrepareTask">
         <dc:Bounds x="472" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -249,13 +241,25 @@ next(null, true);</bpmn:conditionExpression>
           <dc:Bounds x="159" y="265" width="50" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Association_0azs29r_di" bpmnElement="Association_0azs29r">
-        <di:waypoint x="675" y="280" />
-        <di:waypoint x="727" y="340" />
-      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0oqoqme_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1182" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1190" y="265" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0whs6t4_di" bpmnElement="TextAnnotation_0whs6t4">
+        <dc:Bounds x="400" y="120" width="120" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1dcil0f_di" bpmnElement="TextAnnotation_1dcil0f">
+        <dc:Bounds x="690" y="340" width="100" height="30" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_0gtspkr_di" bpmnElement="Association_0gtspkr">
         <di:waypoint x="388" y="200" />
         <di:waypoint x="436" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0azs29r_di" bpmnElement="Association_0azs29r">
+        <di:waypoint x="675" y="280" />
+        <di:waypoint x="727" y="340" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

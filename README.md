@@ -13,7 +13,7 @@ This Blueprint gets all (depending on config) users from Microsoft Active Direct
 
 ## Requirements
 
-* Onify Hub v2
+* Onify Hub API 2.3.0 or later
 * Onify Agent (tagged `agent`)
 * Onify Flow license
 * Camunda Modeler 4.4 or later 
