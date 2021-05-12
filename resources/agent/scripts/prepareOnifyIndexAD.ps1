@@ -49,7 +49,7 @@ foreach ($domain in $config.domains) {
         $deltaSync = $false
     }
     if ($arrSearchConfig) {
-        $searchConfigs = ($domain.searchConfig | Where-Object { $arrSearchConfig -match $_.name })
+        $searchConfigs = ($domain.searchConfig | Where-Object { $arrSearchConfig -eq $_.name })
         if ($searchConfigs) {
             $errSearchConfigs = (Compare-Object $arrSearchConfig $searchConfigs.name).InputObject
         }
@@ -93,7 +93,6 @@ foreach ($domain in $config.domains) {
                     }
                 }
             }
-            #Write-Information "Get AD objects from search config '$($searchConfig.name)' in $($domain.domainName).."
             $adObjects = foreach($searchBase in $searchConfig.searchBases) {
                 if ($searchBase.enabled) {
                     if ($deltaSync) {
@@ -111,52 +110,101 @@ foreach ($domain in $config.domains) {
             }
             $usnCache = Get-Content -Raw -Path "$($modulePath)\cache\$($domain.domainName)\usnCache.json" | ConvertFrom-Json
             if ($adObjects) {
-                $adObjects = ($adObjects | Sort-Object -Unique objectGuid)
+                $adObjects = @($adObjects | Sort-Object -Unique objectGuid)
                 Write-Log -Message ("Preparing $($adObjects.Count) objects for indexing in Onify") -Path $logFile -Level "Info"
                 $onifyADObjects = foreach ($adObject in $adObjects) {
                     if (($useTemplate) -and ($template)) {
                         $adObjectTemplate = $adObjectBaseTemplate | ConvertTo-Json | ConvertFrom-Json
-                        if ($adObject.Enabled -eq $false) { 
-                            $status = "Disabled"
-                        }
-                        elseif ($adObject.LockedOut -eq $true) {
-                            $status = "Locked"
-                        }
-                        elseif ($adObject.AccountExpirationDate) {
-                            if ((get-date) -ge $adObject.AccountExpirationDate) {
-                                $status = "Exipred"
-                            }
-                        }
-                        else {
-                            $status = "Active"
-                        }
-                        $adObjectTemplate.status = $($status)
-                        $adObjectTemplate.color = $searchConfig.statusColor."$($status)"
                         foreach($adObjectProp in $adObjectTemplate.PsObject.Properties) {
                             if ($adObjectProp.TypeNameOfValue -eq "System.Management.Automation.PSCustomObject") {
                                 foreach ($prop in $adObjectProp.Value.PsObject.Properties) {
-                                    $regexMatches = [regex]::Matches($prop.Value,"\<(.*?)\>")
-                                    if ($regexMatches) {
-                                        foreach ($match in $regexMatches) {
-                                            if ($adObject.PsObject.Properties.Name.ToLower().Contains(("$($match.Value)" -replace "[\<\>]",""))){ 
-                                                $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" -replace "$($match.Value)",$adObject.("$($match.Value)" -replace "[\<\>]","")
+                                    if ([regex]::IsMatch($prop.Value,"\<(.*?)\>")) {
+                                        $regexMatches = [regex]::Matches($prop.Value,"\<(.*?)\>")
+                                        if ($regexMatches) {
+                                            foreach ($match in $regexMatches) {
+                                                if ($adObject.PsObject.Properties.Name.ToLower().Contains(("$($match.Value)" -replace "[\<\>]",""))){
+                                                    if ($prop.Value.StartsWith("expr")) {
+                                                        $expr = [regex]::Matches($prop.Value,"expr\((.*)\)")
+                                                        if ($expr) {
+                                                            $cmd = $expr.Groups[1].Value
+                                                            $cmd = $cmd -replace "$($match.Value)",$adObject.("$($match.Value)" -replace "[\<\>]","")
+                                                            try {
+                                                                $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = (Invoke-Expression -Command $cmd)
+                                                            }
+                                                            catch {
+                                                                $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = ""
+                                                            }
+                                                        }
+                                                    }
+                                                    else {
+                                                        $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" -replace "$($match.Value)",$adObject.("$($match.Value)" -replace "[\<\>]","")
+                                                    }
+                                                }
+                                                else {
+                                                    $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" -replace "$($match.Value)",""
+                                                }
                                             }
-                                            else {
-                                                $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" -replace "$($match.Value)",""
+                                        }
+                                    }
+                                    else {
+                                        if (![string]::IsNullOrEmpty($prop.Value)) {
+                                            if ($prop.Value.StartsWith("expr")) {
+                                                $expr = [regex]::Matches($prop.Value,"expr\((.*)\)")
+                                                if ($expr) {
+                                                    $cmd = $expr.Groups[1].Value
+                                                    try {
+                                                        $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = (Invoke-Expression -Command $cmd)
+                                                    }
+                                                    catch {
+                                                        $adObjectTemplate."$($adObjectProp.Name)"."$($prop.Name)" = ""
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                             else {
-                                $regexMatches = [regex]::Matches($adObjectProp.Value,"\<(.*?)\>")
-                                if ($regexMatches) {
-                                    foreach ($match in $regexMatches) {
-                                        if ($adObject.PsObject.Properties.Name.ToLower().Contains(("$($match.Value)" -replace "[\<\>]",""))){
-                                            $adObjectTemplate."$($adObjectProp.Name)" = $adObjectTemplate."$($adObjectProp.Name)" -replace "$($match.Value)",$adObject.("$($match.Value)" -replace "[\<\>]","")
+                                if ([regex]::IsMatch($adObjectProp.Value,"\<(.*?)\>")) {
+                                    $regexMatches = [regex]::Matches($adObjectProp.Value,"\<(.*?)\>")
+                                    if ($regexMatches) {
+                                        foreach ($match in $regexMatches) {
+                                            if ($adObject.PsObject.Properties.Name.ToLower().Contains(("$($match.Value)" -replace "[\<\>]",""))){
+                                                if ($adObjectProp.Value.StartsWith("expr")) {
+                                                    $expr = [regex]::Matches($adObjectProp.Value,"expr\((.*)\)")
+                                                    if ($expr) {
+                                                        $cmd = $expr.Groups[1].Value -replace "$($match.Value)",$adObject.("$($match.Value)" -replace "[\<\>]","")
+                                                        try {
+                                                            $adObjectTemplate."$($adObjectProp.Name)" = (Invoke-Expression -Command $cmd)
+                                                        }
+                                                        catch {
+                                                            $adObjectTemplate."$($adObjectProp.Name)" = ""
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    $adObjectTemplate."$($adObjectProp.Name)" = $adObjectTemplate."$($adObjectProp.Name)" -replace "$($match.Value)",$adObject.("$($match.Value)" -replace "[\<\>]","")
+                                                }
+                                            }
+                                            else {
+                                                $adObjectTemplate."$($adObjectProp.Name)" = $adObjectTemplate."$($adObjectProp.Name)" -replace "$($match.Value)",""
+                                            }
                                         }
-                                        else {
-                                            $adObjectTemplate."$($adObjectProp.Name)" = $adObjectTemplate."$($adObjectProp.Name)" -replace "$($match.Value)",""
+                                    }
+                                }
+                                else {
+                                    if (![string]::IsNullOrEmpty($adObjectProp.Value)) {
+                                        if ($adObjectProp.Value.StartsWith("expr")) {
+                                            $expr = [regex]::Matches($adObjectProp.Value,"expr\((.*)\)")
+                                            if ($expr) {
+                                                $cmd = $expr.Groups[1].Value
+                                                try {
+                                                    $adObjectTemplate."$($adObjectProp.Name)" = (Invoke-Expression -Command $cmd)
+                                                }
+                                                catch {
+                                                    $adObjectTemplate."$($adObjectProp.Name)" = ""
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -174,12 +222,14 @@ foreach ($domain in $config.domains) {
                         Write-Log -Message ("Writing delta AD cache for '$($searchConfig.name)' search config $($domain.domainName)..") -Path $logFile -Level "Info"
                         $filePath = "$($modulePath)\cache\$($domain.domainName)\$($usnCache.HighestCommittedUSN)_$($domain.domainName)_$($searchConfig.name)_adCache_delta.json"
                         (ConvertTo-Json $onifyADObjects -Depth 5) | Out-File $filePath -Encoding UTF8
+                        Get-Childitem -Path "$($modulePath)\cache\$($domain.domainName)\*" -Include *.json -Filter "*$($searchConfig.name)_adCache_delta*" | Sort-Object LastWriteTime -desc | Select-Object -Skip 1 | Remove-Item -Force
                     }
                     else {
                         Write-Log -Message ("Writing full AD cache for '$($searchConfig.name)' search config in $($domain.domainName)..") -Path $logFile -Level "Info"
                         $usnCache = Get-Content -Raw -Path "$($modulePath)\cache\$($domain.domainName)\usnCache.json" | ConvertFrom-Json
                         $filePath = "$($modulePath)\cache\$($domain.domainName)\$($usnCache.HighestCommittedUSN)_$($domain.domainName)_$($searchConfig.name)_adCache_full.json"
                         (ConvertTo-Json $onifyADObjects -Depth 5) | Out-File $filePath -Encoding UTF8
+                        Get-Childitem -Path "$($modulePath)\cache\$($domain.domainName)\*" -Include *.json -Filter "*$($searchConfig.name)*" | Sort-Object LastWriteTime -desc | Select-Object -Skip 1 | Remove-Item -Force
                     }
                     $searchConfigResult = @{
                         $($searchConfig.name) = @{

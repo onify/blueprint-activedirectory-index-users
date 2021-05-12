@@ -65,6 +65,9 @@ function Get-ADDSObject {
                     (@{"DomainController"=$($domainConfig.domainController);"HighestCommittedUSN"= [Int64]$RootDSE.HighestCommittedUSN[0]} | ConvertTo-Json) | Out-File "$($PSScriptRoot)\cache\$($domainConfig.domainName)\usnCache.json" -Encoding UTF8
                 }
                 if ($delta) {
+                    if ([string]::IsNullOrEmpty($SearchBase)) {
+                        $SearchBase = $($domainConfig.domainDN)
+                    }
                     Write-Log -Message ("Fetching delta AD objects with LDAPFilter: $($ldapFilter) in SearchBase: $($searchBase)") -Path $logFile -Level "Info"
                     $usnCache = Get-Content -Raw -Path "$($PSScriptRoot)\cache\$($domainConfig.domainName)\usnCache.json" | ConvertFrom-Json
                     $deltaLdapFilter = $($ldapFilter.substring(0,$ldapFilter.LastIndexOf(')')))+"(!IsDeleted=*)(!USNChanged<=$($usnCache.HighestCommittedUSN)))"
@@ -139,6 +142,9 @@ function Get-ADDSObject {
                     }
 			    }	
                 else {
+                    if ([string]::IsNullOrEmpty($SearchBase)) {
+                        $SearchBase = $($domainConfig.domainDN)
+                    }
                     Write-Log -Message ("Fetching AD objects with LDAPFilter: $($ldapFilter) in SearchBase: $($searchBase)") -Path $logFile -Level "Info"
                     $domain = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$($domainConfig.domainController)/$($searchBase)")
 		            $directorySearcher = New-Object System.DirectoryServices.DirectorySearcher($domain)
@@ -175,7 +181,7 @@ function Get-ADDSObject {
             
             }
             else {
-                if ($SearchBase) {
+                if (![string]::IsNullOrEmpty($SearchBase)) {
                     Write-Log -Message ("Fetching AD objects with LDAPFilter: $($ldapFilter) in SearchBase: $($searchBase)") -Path $logFile -Level "Info"
                     $domain = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$searchBase")
                 }
