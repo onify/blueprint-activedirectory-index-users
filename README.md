@@ -5,7 +5,7 @@
 
 # Onify Blueprint: Indexing users from Active Directory
 
-This Blueprint gets all (depending on config) users from Microsoft Active Directory and index them to Onify. To integrate with AD we use the `Onify.ActiveDirectory` PowerShell module (by [Tony Aronsson](https://github.com/Aronsson84) @ [Zitac](https://github.com/zitacconsulting)) to both be able to do full index or delta index if needed. 
+This Blueprint gets all (depending on config) users from Microsoft Active Directory and index them to Onify. To integrate with AD we use the `Onify.ActiveDirectory` PowerShell module (by [Tony Aronsson](https://github.com/Aronsson84) @ [Zitac](https://github.com/zitacconsulting)) to both be able to do full index or delta index if needed. With the `Onify.ActiveDirectory` module, we can index anything from AD, like users, computers, groups, etc. 
 
 ## Screenshots
 
@@ -13,7 +13,7 @@ This Blueprint gets all (depending on config) users from Microsoft Active Direct
 
 ## Requirements
 
-* Onify Hub v2
+* Onify Hub API 2.3.0 or later
 * Onify Agent (tagged `agent`)
 * Onify Flow license
 * Camunda Modeler 4.4 or later 
