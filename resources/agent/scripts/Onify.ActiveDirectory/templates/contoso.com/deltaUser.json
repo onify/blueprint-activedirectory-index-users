@@ -7,18 +7,19 @@
                 "user"
             ],
     "key":  "\u003csamaccountname\u003e",
-    "status":  "\u003cstatus\u003e",
-    "color":  "\u003cstatusColor\u003e",
+    "status":  "expr(if ($adObject.Enabled -eq $false) { \"Disabled\" } elseif ($adObject.LockedOut -eq $true) { \"Locked\" } elseif ($adObject.AccountExpirationDate) { if ((get-date) -ge $adObject.AccountExpirationDate) { \"Exipred\" } } else { \"Active\" })",
+    "color":  "expr(if ($adObject.Enabled -eq $false) { \"#f9cc2a\" } elseif ($adObject.LockedOut -eq $true) { \"#fc3c59\" } elseif ($adObject.AccountExpirationDate) { if ((get-date) -ge $adObject.AccountExpirationDate) { \"#f9cc2a\" } } else { \"#559e31\" })",
     "attribute":  {
                       "_info":  "\u003cinfo\u003e",
                       "company":  "\u003ccompany\u003e",
                       "username":  "\u003csamaccountname\u003e",
                       "_id":  "\u003csamaccountname\u003e_\u003cobjectguid\u003e",
                       "mail":  "\u003cmail\u003e",
-                      "_delta_oldCN":  "\u003coldcn\u003e",
+                      "_services_ad_membership":  "expr($groups = foreach ($group in $adObject.memberof) { Get-ADGroup -Identity $group } $groups.SamaccountName)",
+                      "_delta_oldcn":  "\u003coldcn\u003e",
                       "mobilephone":  "\u003cmobile\u003e",
                       "office":  "\u003cphysicaldeliveryofficename\u003e",
-                      "_delta_adAction":  "\u003caction\u003e",
+                      "_delta_adaction":  "\u003caction\u003e",
                       "title":  "\u003ctitle\u003e",
                       "phone":  "\u003cphone\u003e"
                   }
