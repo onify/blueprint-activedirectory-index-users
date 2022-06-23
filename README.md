@@ -9,7 +9,7 @@ This Blueprint gets all (depending on config) users from Microsoft Active Direct
 
 ## Screenshots
 
-![alt text](flow.png "Flow")
+![Onify Blueprint: Indexing users from Active Directory](blueprint.jpg "Blueprint")
 
 ## Requirements
 
